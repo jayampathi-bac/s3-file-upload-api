@@ -4,10 +4,10 @@ provider:
   name: aws
   runtime: nodejs12.x
   stage: dev
-  region: us-west-1
+  region: us-east-1
 
 custom:
-  fileUploadBucketName: ${self:service}-bucket-${self:provider.stage}
+  fileUploadBucketName: ${self:service}-bucket-test-22-${self:provider.stage}
 
 plugins:
   - serverless-iam-roles-per-function
@@ -23,6 +23,11 @@ functions:
       - http:
           path: images
           method: POST
+      - s3:
+          bucket: ${self:custom.fileUploadBucketName}
+          VersioningConfiguration: Enabled
+          event: s3:ObjectCreated:*
+          existing: true
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -31,10 +36,11 @@ functions:
     environment:
       FILE_UPLOAD_BUCKET_NAME: ${self:custom.fileUploadBucketName}
 
-resources:
-  Resources:
-    FileBucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: ${self:custom.fileUploadBucketName}
-        AccessControl: PublicRead
+#resources:
+#  Resources:
+#    FileBucket:
+#      Type: AWS::S3::Bucket
+#      Properties:
+#        BucketName: ${self:custom.fileUploadBucketName}
+#        AccessControl: PublicRead
+      
